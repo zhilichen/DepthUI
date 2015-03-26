@@ -5,35 +5,20 @@ namespace DepthUI{
 
 class DEPTHUI_API InputHandler
 {
+private:
+	System * parent_system_;
 public:
-	InputHandler();
+	// input states
+public:
+	InputHandler(System * parent_system);
 	~InputHandler();
 public:
 	// input injections
-	bool InjectMouseClick(int x, int y)
-	{
-		// todo
-		// find clicked control
-		// send event message to eventhandler with that control's id
-		return true;
-	};
-
-	bool InjectMouseMotion(int x, int y, int mouseType)
-	{
-		// send event message to all?
-		return true;
-	}
-
-	bool InjectMousePassiveMotion(int x, int y, int mouseType)
-	{
-		return true;
-	}
-
-	bool InjectKeyPress(int keyValue)
-	{
-		// send event message to active control
-		return true;
-	}
+	bool InjectMouseDown(int x, int y, int mouseType);
+	bool InjectMouseUp(int x, int y, int mouseType);
+	bool InjectMouseMotion(int x, int y, int mouseType);
+	bool InjectMousePassiveMotion(int x, int y, int mouseType);
+	bool InjectKeyPress(int keyValue);
 };
 
 }

@@ -23,6 +23,7 @@ public:
 	// tree structure
 	std::vector<Control*> children_;
 	Control * parent_;
+	Control * findControlByInternalID(uint ID);
 
 	// event response
 	EventBinder event_binder_;

@@ -45,6 +45,8 @@ bool System::Initialize(int glut_window)
 	control_root_->parent_system_ = this;
 	control_root_->logger_ = logger_;
 
+	input_handler_ = new InputHandler(this);
+
 	return true;
 }
 
@@ -186,19 +188,35 @@ void System::RenderControls()
 
 void System::DrawToScreen()
 {
+	shader_quad2D_.SetParameters(tex_Color_, view_window_->window_width, view_window_->window_height);
 
+	shader_quad2D_.DefaultRender();
 }
 
-void System::GetIDMouseOn(int x, int y)
+uint System::GetIDMouseOn(int x, int y)
 {
+	if (fbo_GUI_ != 0 && !is_ID_map_dirty_)
+	{
+		DEPTHGL(glBindFramebuffer(GL_FRAMEBUFFER, fbo_GUI_));
 
+		GLuint id_pixel;
+		DEPTHGL(glReadPixels(x, view_window_->window_height - y - 1, 1, 1, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, &id_pixel));
+		id_pixel = id_pixel & 0xFF;
+
+		printf("mouse on %u\n", id_pixel);
+
+		DEPTHGL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+
+		return id_pixel;
+	}
+	else return 0;
 }
 
 Control * System::ControlRoot()
 {
 	return control_root_;
 }
-InputHandler * System::InputHandler()
+InputHandler * System::InputHandle()
 {
 	return input_handler_;
 }

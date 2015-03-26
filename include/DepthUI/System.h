@@ -2,6 +2,7 @@
 
 #include "Base.h"
 #include "Hierarchy.h"
+#include "Shader.h"
 
 namespace DepthUI{
 
@@ -18,6 +19,7 @@ private:
 	uint tex_Color_;
 	uint tex_IDmap_;
 	uint fbo_GUI_;
+	Quad2DTextureShader shader_quad2D_;
 
 	// states
 	bool is_ID_map_resized_;
@@ -31,14 +33,14 @@ public:
 	bool Initialize(int glut_window = 0);
 	void SetViewport(int x, int y, int w, int h);
 	void Render();
-	void GetIDMouseOn(int x, int y);
+	uint GetIDMouseOn(int x, int y);
 	~System();
 private:
 	void RenderControls();
 	void DrawToScreen();
 public:
 	Control * ControlRoot();
-	InputHandler * InputHandler();
+	InputHandler * InputHandle();
 };
 
 }

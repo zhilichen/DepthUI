@@ -57,10 +57,15 @@ void Button::InitializeRenderObjects()
 
 void Button::Draw(bool draw_id)
 {
-	if (draw_id) glStencilFunc(GL_ALWAYS, ID_Internal_, 0xFF);
-
+	if (!is_render_ready_)
+	{
+		InitializeRenderObjects();
+		is_render_ready_ = true;
+	}
 	if (is_render_ready_)
 	{
+		if (draw_id) glStencilFunc(GL_ALWAYS, ID_Internal_, 0xFF);
+
 		shader_default_.Enable();
 
 		shader_default_.SetTransformationMatrices(viewlayout_->transform_projection_.matrix(), viewlayout_->transform_modelview_.matrix());
@@ -70,11 +75,6 @@ void Button::Draw(bool draw_id)
 		DEPTHGL(glBindVertexArray(0));
 
 		shader_default_.Disable();
-	}
-	else
-	{
-		InitializeRenderObjects();
-		is_render_ready_ = true;
 	}
 
 	Control::Draw(draw_id);

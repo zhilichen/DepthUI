@@ -38,6 +38,23 @@ Control::Control(std::string name){
 	is_render_ready_ = false;
 }
 
+Control * Control::findControlByInternalID(uint ID)
+{
+	if (ID_Internal_ == ID)
+	{
+		return this;
+	}
+	else
+	{
+		Control * controlInChildren = NULL;
+		for (std::vector<Control*>::iterator iter = children_.begin(); iter != children_.end() && controlInChildren==NULL; iter++)
+		{
+			controlInChildren = (*iter)->findControlByInternalID(ID);
+		}
+		return controlInChildren;
+	}
+}
+
 void Control::BindCallBack(int eventType, EventBinder::CallBackFunctionType callback)
 {
 	event_binder_.BindEventCallBack(eventType, callback);

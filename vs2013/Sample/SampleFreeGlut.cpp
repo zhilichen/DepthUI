@@ -35,7 +35,18 @@ void h_Idle(void)
 
 void h_Mouse(int button, int state, int x, int y)
 {
-
+	if (button == GLUT_LEFT_BUTTON)
+	{
+		if (state == GLUT_DOWN)
+		{
+			depthui->InputHandle()->InjectMouseDown(x, y, DepthUI::MOUSE_LEFT_BUTTON);
+		}
+		else if (state == GLUT_UP)
+		{
+			depthui->InputHandle()->InjectMouseUp(x, y, DepthUI::MOUSE_LEFT_BUTTON);
+		}
+	}
+	
 }
 
 void startGLUT(int argc, char **argv)
@@ -114,13 +125,13 @@ void startGLUT(int argc, char **argv)
 	DepthUI::Button * button = new DepthUI::Button("button_test", frame);
 	
 	setting_x.size_style = DepthUI::SIZE_ABSOLUTE;
-	setting_x.size_absolute = 150;
+	setting_x.size_absolute = 300;
 	setting_x.alignment_style = DepthUI::ALIGNMENT_LEFT;
 	setting_x.offset_style = DepthUI::OFFSET_ABSOLUTE;
 	setting_x.offset_absolute = 20;
 
 	setting_y.size_style = DepthUI::SIZE_ABSOLUTE;
-	setting_y.size_absolute = 80;
+	setting_y.size_absolute = 200;
 	setting_y.alignment_style = DepthUI::ALIGNMENT_TOP;
 	setting_y.offset_style = DepthUI::OFFSET_ABSOLUTE;
 	setting_y.offset_absolute = 20;

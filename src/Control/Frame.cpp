@@ -57,10 +57,16 @@ void Frame::InitializeRenderObjects()
 
 void Frame::Draw(bool draw_id)
 {
-	if (draw_id) glStencilFunc(GL_ALWAYS, ID_Internal_, 0xFF);
+	if (!is_render_ready_)
+	{
+		InitializeRenderObjects();
+		is_render_ready_ = true;
+	}
 
 	if (is_render_ready_)
 	{
+		if (draw_id) glStencilFunc(GL_ALWAYS, ID_Internal_, 0xFF);
+
 		glPushAttrib(GL_POLYGON_BIT);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
@@ -74,11 +80,6 @@ void Frame::Draw(bool draw_id)
 
 		shader_default_.Disable();
 		glPopAttrib();
-	}
-	else
-	{
-		InitializeRenderObjects();
-		is_render_ready_ = true;
 	}
 
 	Control::Draw(draw_id);

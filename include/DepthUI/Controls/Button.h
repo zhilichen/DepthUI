@@ -26,7 +26,7 @@ private:
 public:
 	// behaviors
 	virtual void InitializeRenderObjects();
-	virtual void Draw(bool draw_id = false);
+	virtual void Draw(bool draw_id);
 };
 
 }

@@ -19,6 +19,7 @@ System::System()
 	is_ID_map_resized_ = true;
 	tex_IDmap_ = 0;
 	fbo_GUI_ = 0;
+	view_window_ = NULL;
 }
 
 
@@ -102,34 +103,27 @@ void System::Render()
 		glBindTexture(GL_TEXTURE_2D, 0);
 
 		DEPTHGL(glGenFramebuffers(1, &fbo_GUI_));
-		DEPTHGL(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo_GUI_));
+		DEPTHGL(glBindFramebuffer(GL_FRAMEBUFFER, fbo_GUI_));
 
-		GLuint rbo_depth;
-		DEPTHGL(glGenRenderbuffers(1, &rbo_depth));
-		DEPTHGL(glBindRenderbuffer(GL_RENDERBUFFER, rbo_depth));
-		DEPTHGL(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT32,
-			view_window_->window_width, view_window_->window_height));
-		DEPTHGL(glBindRenderbuffer(GL_RENDERBUFFER, 0));
-
-		GLuint rbo_stencil;
-		DEPTHGL(glGenRenderbuffers(1, &rbo_stencil));
-		DEPTHGL(glBindRenderbuffer(GL_RENDERBUFFER, rbo_stencil));
-		DEPTHGL(glRenderbufferStorage(GL_RENDERBUFFER, GL_STENCIL_INDEX8,
+		GLuint rbo_depth_stencil;
+		DEPTHGL(glGenRenderbuffers(1, &rbo_depth_stencil));
+		DEPTHGL(glBindRenderbuffer(GL_RENDERBUFFER, rbo_depth_stencil));
+		DEPTHGL(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_STENCIL,
 			view_window_->window_width, view_window_->window_height));
 		DEPTHGL(glBindRenderbuffer(GL_RENDERBUFFER, 0));
 
 		GLenum DrawBuffers[] = { GL_COLOR_ATTACHMENT0 };
 		DEPTHGL(glDrawBuffers(1, DrawBuffers));
 
-		DEPTHGL(glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rbo_depth));
-		DEPTHGL(glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo_stencil));
+		DEPTHGL(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rbo_depth_stencil));
+		DEPTHGL(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo_depth_stencil));
 
-		DEPTHGL(glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex_Color_, 0));
+		DEPTHGL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex_Color_, 0));
 		//DEPTHGL(glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, tex_IDmap_, 0));
 		//DEPTHGL(glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_TEXTURE_2D, tex_IDmap_, 0));
 
 		GLenum status;
-		status = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER);
+		status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 		switch (status)
 		{
 		case GL_FRAMEBUFFER_COMPLETE:
@@ -139,7 +133,7 @@ void System::Render()
 			WriteLog("Framebuffer creation fail.");
 		}
 
-		DEPTHGL(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0));
+		DEPTHGL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 	}
 
 	RenderControls();
@@ -152,42 +146,42 @@ void System::Render()
 
 void System::RenderControls()
 {
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo_GUI_);
+	DEPTHGL(glBindFramebuffer(GL_FRAMEBUFFER, fbo_GUI_));
 
-	glClearColor(0, 0, 0, 0);
-	glClearStencil(2);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-	
 	if (is_ID_map_dirty_)
 	{
+		glClearColor(0, 0, 0, 0);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClearStencil(0);
+		glClear(GL_STENCIL_BUFFER_BIT);
 		glEnable(GL_STENCIL_TEST);
-		glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
+		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 	}
 
-	//control_root_->Draw(is_ID_map_dirty_);
+	control_root_->Draw(is_ID_map_dirty_);
 
 	if (is_ID_map_dirty_)
 	{
 		glDisable(GL_STENCIL_TEST);
-		glStencilMask(0x00);
-		glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+
+		//GLuint * mypixels = new GLuint[view_window_->window_width * view_window_->window_height];
+		//DEPTHGL(glReadPixels(0, 0, view_window_->window_width, view_window_->window_height, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, mypixels));
+
+		//std::ofstream fout("stencil.txt");
+		//for (int i = 0; i < view_window_->window_height; i++)
+		//{
+		//	for (int j = 0; j < view_window_->window_width; j++)
+		//	{
+		//		fout << (((mypixels[(i*view_window_->window_width + j)+0])) & 0xFF) << " ";
+		//	}
+		//	fout << std::endl;
+		//}
+		//fout.close();
+
+		//delete[] mypixels;
 	}
 
-	GLubyte * mypixels = new GLubyte[view_window_->window_width * view_window_->window_height];
-	DEPTHGL(glReadPixels(0, 0, view_window_->window_width, view_window_->window_height, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, mypixels));
-	std::ofstream fout("stencil.txt");
-	for (int i = 0; i < view_window_->window_height;i++)
-	{
-		for (int j = 0; j < view_window_->window_width; j++)
-		{
-			fout << ((mypixels[i*view_window_->window_width + j]) & 0x00FF) << " ";
-		}
-		fout << std::endl;
-	}
-	fout.close();
-	
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-	
+	DEPTHGL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 }
 
 void System::DrawToScreen()

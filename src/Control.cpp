@@ -6,6 +6,8 @@ namespace DepthUI{
 Control::Control(std::string name, Control * parent){
 	name_ = name;
 	viewlayout_ = new ViewLayout();
+	//viewlayout_old_ = new ViewLayout();
+
 	if (parent != NULL)
 	{
 		parent_ = parent;
@@ -26,6 +28,7 @@ Control::Control(std::string name, Control * parent){
 Control::Control(std::string name){
 	name_ = name;
 	viewlayout_ = new ViewLayout();
+	//viewlayout_old_ = new ViewLayout();
 	
 	ID_Internal_ = 0;
 	parent_ = NULL;
@@ -99,7 +102,8 @@ void Control::SetLayout(const ViewLayout::SingleDimensionLayout & layout_x, cons
 
 void Control::Resize(ViewLayout * view_parent)
 {
-	WriteLog(name_ + "-" + char(ID_Internal_+'0'));
+	//swap(viewlayout_old_, viewlayout_);
+
 	// recompute size based on parent's size
 	if (view_parent != NULL)
 		viewlayout_->RefreshGlobalLayout(*view_parent);

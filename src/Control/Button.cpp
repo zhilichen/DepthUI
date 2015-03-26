@@ -77,7 +77,7 @@ void Button::Draw(bool draw_id)
 		is_render_ready_ = true;
 	}
 
-	Control::Draw();
+	Control::Draw(draw_id);
 }
 
 }

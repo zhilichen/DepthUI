@@ -53,8 +53,8 @@ public:
 	float z_order_;
 	DefaultShader shader_default_;
 	virtual void InitializeRenderObjects();
-	virtual void Draw(bool draw_id = false);
-	void DrawChildren(bool draw_id = false);
+	virtual void Draw(bool draw_id);
+	void DrawChildren(bool draw_id);
 };
 
 }

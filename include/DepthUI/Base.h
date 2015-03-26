@@ -74,6 +74,16 @@ enum LayoutOption{
 
 #define DEPTHGL(x) x;{GLenum errorCode=glGetError();if (errorCode!=GL_NO_ERROR){printf("GL error: %d\n", errorCode);__debugbreak();}}
 
+template
+<typename T>
+void swap(T & a, T & b)
+{
+	T tmp;
+	tmp = a;
+	a = b;
+	b = tmp;
+}
+
 // forward definition
 class System;
 
